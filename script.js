@@ -20,26 +20,25 @@ function loadasset(path) {
 }
 
 async function display (){
-  const hero = await  loadasset('player.png');
-  const enemyShip = await loadasset('enemyShip.png');
+  const hero = await loadasset("player.png");
+  const enemyShip = await loadasset("enemyShip.png");
 
-  let canvas = document.querySelector("#canvas1");
+  let canvas = document.querySelector("#canvas");
   var ctx = canvas.getContext("2d");
 
-  
-  ctx.drawImage(hero, canvas.width / 2-45, canvas.height -canvas.height/4);
+  ctx.drawImage(hero, canvas.width / 2 - 45, canvas.height - canvas.height / 4);
 
   const monster_number = 5;
-const monster_width = monster_number * 98;
-const start_x = (canvas.width - monster_width) / 2;
-const stop_x = start_x + monster_width;
+  const monster_width = monster_number * 98;
+  const start_x = (canvas.width - monster_width) / 2;
+  const stop_x = start_x + monster_width;
 
-for (let x = start_x; x < stop_x; x += 98) {
-  for (let y = 0; y < 50 * 5; y += 50) ctx.drawImage(enemyShip, x, y);
-}
+  for (let x = start_x; x < stop_x; x += 98) {
+    for (let y = 0; y < 50 * 5; y += 50) ctx.drawImage(enemyShip, x, y);
+  }
 }
 
-display();
+
 
 
 
@@ -48,7 +47,7 @@ class GameObject {
   constructor (x, y, type){
     this.x= x;
     this.y = y;
-    this.type = "";
+    this.type = type;
     this.dead = false;
     this.height = 0;
     this.width = 0;
@@ -72,8 +71,11 @@ class GameObject {
 // }
 
 class Hero extends GameObject{
-  constructor(x,y,type){
-    super(x,y, 'hero'); //call the parent class constructor to initialize it's properties
+  constructor(x,y){
+    super(x,y); //call the parent class constructor to initialize it's properties
+    this.type = "hero";
+    this.height = 75;
+    this.width = 99;
   }
 }
 
@@ -156,3 +158,77 @@ let heroImg,
     gameObjects = [], 
     hero, 
     eventEmitter = new EventEmitter();
+
+
+
+function initGame() {
+  gameObjects = [];
+  createEnemies();
+  createHero();
+
+  eventEmitter.on(Messages.KEY_EVENT_UP, () => {
+    hero.y -= 10;
+  });
+
+  eventEmitter.on(Messages.KEY_EVENT_DOWN, () => {
+    hero.y += 10;
+  });
+
+  eventEmitter.on(Messages.KEY_EVENT_LEFT, () => {
+    hero.x -= 10;
+  });
+
+  eventEmitter.on(Messages.KEY_EVENT_RIGHT, () => {
+    hero.x += 10;
+  });
+}
+
+
+
+window.onload = async ()=>{
+  canvas=document.getElementById("canvas");
+  ctx=canvas.getContext('2d');
+  heroImg = await loadasset("player.png") ;
+  enemyImg =await loadasset("enemyShip.png" );
+  laserImg = await loadasset('laserRed.png');
+
+  initGame();
+  let gameLoopId = setInterval(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawGameObjects(ctx);
+  }, 100)
+
+}
+
+
+function createEnemies() {
+  const MONSTER_TOTAL = 5;
+  const MONSTER_WIDTH = MONSTER_TOTAL * 98;
+  const START_X = (canvas.width - MONSTER_WIDTH) / 2;
+  const STOP_X = START_X + MONSTER_WIDTH;
+
+  for (let x = START_X; x < STOP_X; x += 98) {
+    for (let y = 0; y < 50 * 5; y += 50) {
+      const enemy = new Enemy(x, y);
+      enemy.img = enemyImg;
+      gameObjects.push(enemy);
+    }
+  }
+}
+
+
+function createHero() {
+  hero = new Hero(
+    canvas.width / 2 - 45,
+    canvas.height - canvas.height / 4
+  );
+  hero.img = heroImg;
+  gameObjects.push(hero);
+}
+
+
+function drawGameObjects(ctx) {
+  gameObjects.forEach(go => go.draw(ctx));
+}
