@@ -106,6 +106,16 @@ class Hero extends GameObject{
     canFire() {
       return this.cooldown === 0;
     }
+    decrementLife() {
+      this.life--;
+      if (this.life === 0) {
+        this.dead = true;
+      }
+    }
+
+    incrementPoints() {
+      this.points += 100;
+    }
   
 }
 
@@ -245,7 +255,13 @@ function initGame() {
   eventEmitter.on(Messages.COLLISION_ENEMY_LASER, (_, { first, second }) => {
     first.dead = true;
     second.dead = true;
+    hero.incrementPoints();
   });
+
+  eventEmitter.on(Messages.COLLISION_ENEMY_HERO, (_, { enemy }) => {
+    enemy.dead = true;
+    hero.decrementLife();
+ });
 }
 
 
