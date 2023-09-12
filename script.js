@@ -19,24 +19,24 @@ function loadasset(path) {
   });
 }
 
-async function display (){
-  const hero = await loadasset("player.png");
-  const enemyShip = await loadasset("enemyShip.png");
+// async function display (){
+//   const hero = await loadasset("player.png");
+//   const enemyShip = await loadasset("enemyShip.png");
 
-  let canvas = document.querySelector("#canvas");
-  var ctx = canvas.getContext("2d");
+//   let canvas = document.querySelector("#canvas");
+//   var ctx = canvas.getContext("2d");
 
-  ctx.drawImage(hero, canvas.width / 2 - 45, canvas.height - canvas.height / 4);
+//   ctx.drawImage(hero, canvas.width / 2 - 45, canvas.height - canvas.height / 4);
 
-  const monster_number = 5;
-  const monster_width = monster_number * 98;
-  const start_x = (canvas.width - monster_width) / 2;
-  const stop_x = start_x + monster_width;
+//   const monster_number = 5;
+//   const monster_width = monster_number * 98;
+//   const start_x = (canvas.width - monster_width) / 2;
+//   const stop_x = start_x + monster_width;
 
-  for (let x = start_x; x < stop_x; x += 98) {
-    for (let y = 0; y < 50 * 5; y += 50) ctx.drawImage(enemyShip, x, y);
-  }
-}
+//   for (let x = start_x; x < stop_x; x += 98) {
+//     for (let y = 0; y < 50 * 5; y += 50) ctx.drawImage(enemyShip, x, y);
+//   }
+// }
 
 
 
@@ -269,10 +269,7 @@ function initGame() {
 window.onload = async ()=>{
   canvas=document.getElementById("canvas");
   ctx=canvas.getContext('2d');
-  // ctx.font = "30px Arial";
-  // ctx.fillStyle = "red";
-  // ctx.textAlign = "right";
-  // ctx.fillText("show this on the screen", 0, 0);
+  
   heroImg = await loadasset("player.png");
   enemyImg =await loadasset("enemyShip.png" );
   laserImg = await loadasset('laserRed.png');
@@ -281,7 +278,7 @@ window.onload = async ()=>{
   initGame();
   let gameLoopId = setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // ctx.fillStyle = "black";
+    ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     updateGameObjects();
     drawPoints();
@@ -371,7 +368,7 @@ function drawLife() {
 
 function drawPoints() {
   ctx.font = "30px Arial";
-  // ctx.fillStyle = "red";
+  ctx.fillStyle = "red";
   ctx.textAlign = "left";
   drawText("Points: " + hero.points, 10, canvas.height-20);
 }
