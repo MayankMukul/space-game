@@ -181,6 +181,8 @@ window.addEventListener("keyup", (evt) => {
     eventEmitter.emit(Messages.KEY_EVENT_RIGHT);
   } else if(evt.keyCode === 32) {
     eventEmitter.emit(Messages.KEY_EVENT_SPACE);
+  } else if(evt.key === "Enter") {
+    eventEmitter.emit(Messages.KEY_EVENT_ENTER);
   }
 });
 
@@ -212,6 +214,11 @@ const Messages = {
   KEY_EVENT_SPACE: "KEY_EVENT_SPACE",
   COLLISION_ENEMY_LASER: "COLLISION_ENEMY_LASER",
   COLLISION_ENEMY_HERO: "COLLISION_ENEMY_HERO",
+
+  GAME_END_LOSS: "GAME_END_LOSS",
+  GAME_END_WIN: "GAME_END_WIN",
+
+  KEY_EVENT_ENTER: "KEY_EVENT_ENTER",
 };
 
 let heroImg, 
@@ -257,6 +264,11 @@ function initGame() {
     first.dead = true;
     second.dead = true;
     hero.incrementPoints();
+
+    if (isEnemiesDead()) {
+      eventEmitter.emit(Messages.GAME_END_WIN);
+    }
+
     console.log(first.x,first.y);
     second.img = lsaerShotImg;
   });
@@ -264,7 +276,23 @@ function initGame() {
   eventEmitter.on(Messages.COLLISION_ENEMY_HERO, (_, { enemy }) => {
     enemy.dead = true;
     hero.decrementLife();
+
+    if (isHeroDead())  {
+      eventEmitter.emit(Messages.GAME_END_LOSS);
+      return; // loss before victory
+    }
+    if (isEnemiesDead()) {
+      eventEmitter.emit(Messages.GAME_END_WIN);
+    }
  });
+
+ eventEmitter.on(Messages.GAME_END_WIN, () => {
+  endGame(true);
+});
+
+eventEmitter.on(Messages.GAME_END_LOSS, () => {
+endGame(false);
+});
 }
 
 
@@ -381,3 +409,12 @@ function drawText(message, x, y) {
   ctx.fillText(message, x, y);
 }
 
+
+function isHeroDead() {
+  return hero.life <= 0;
+}
+
+function isEnemiesDead() {
+  const enemies = gameObjects.filter((go) => go.type === "Enemy" && !go.dead);
+  return enemies.length === 0;
+}
