@@ -217,6 +217,7 @@ const Messages = {
 let heroImg, 
     enemyImg, 
     laserImg,
+    lsaerShotImg,
     canvas, ctx, 
     gameObjects = [], 
     hero, 
@@ -256,6 +257,8 @@ function initGame() {
     first.dead = true;
     second.dead = true;
     hero.incrementPoints();
+    console.log(first.x,first.y);
+    second.img = lsaerShotImg;
   });
 
   eventEmitter.on(Messages.COLLISION_ENEMY_HERO, (_, { enemy }) => {
@@ -273,6 +276,7 @@ window.onload = async ()=>{
   heroImg = await loadasset("player.png");
   enemyImg =await loadasset("enemyShip.png" );
   laserImg = await loadasset('laserRed.png');
+  lsaerShotImg = await loadasset('laserRedShot.png');
   lifeImg = await loadasset("life.png");
 
   initGame();
