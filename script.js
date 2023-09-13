@@ -203,6 +203,10 @@ class EventEmitter {
       this.listeners[message].forEach((l) => l(message, payload));
     }
   }
+
+  clear() {
+    this.listeners = {};
+  }
 }
 
 const Messages = {
@@ -292,6 +296,10 @@ function initGame() {
 
 eventEmitter.on(Messages.GAME_END_LOSS, () => {
 endGame(false);
+});
+
+eventEmitter.on(Messages.KEY_EVENT_ENTER, () => {
+  resetGame();
 });
 }
 
@@ -417,4 +425,49 @@ function isHeroDead() {
 function isEnemiesDead() {
   const enemies = gameObjects.filter((go) => go.type === "Enemy" && !go.dead);
   return enemies.length === 0;
+}
+
+function displayMessage(message, color = "red") {
+  ctx.font = "30px Arial";
+  ctx.fillStyle = color;
+  ctx.textAlign = "center";
+  ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+}
+
+function endGame(win) {
+  clearInterval(gameLoopId);
+
+  // set a delay so we are sure any paints have finished
+  setTimeout(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (win) {
+      displayMessage(
+        "Victory!!! Pew Pew... - Press [Enter] to start a new game Captain Pew Pew",
+        "green"
+      );
+    } else {
+      displayMessage(
+        "You died !!! Press [Enter] to start a new game Captain Pew Pew"
+      );
+    }
+  }, 200)  
+}
+
+function resetGame() {
+  if (gameLoopId) {
+    clearInterval(gameLoopId);
+    eventEmitter.clear();
+    initGame();
+    gameLoopId = setInterval(() => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawPoints();
+      drawLife();
+      updateGameObjects();
+      drawGameObjects(ctx);
+    }, 100);
+  }
 }
