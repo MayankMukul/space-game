@@ -316,7 +316,7 @@ window.onload = async ()=>{
   lifeImg = await loadasset("life.png");
 
   initGame();
-  let gameLoopId = setInterval(() => {
+  gameLoopId = setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
