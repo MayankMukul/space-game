@@ -284,7 +284,7 @@ function drawLife() {
 }
 
 function drawPoints() {
-  ctx.font = "30px Arial";
+  ctx.font = "30px Oswald";
   ctx.fillStyle = "red";
   ctx.textAlign = "left";
   drawText("Points: " + hero.points, 10, canvas.height-20);
@@ -339,8 +339,14 @@ function drawText(message, x, y) {
   ctx.fillText(message, x, y);
 }
 
+function displaytitle(){
+  ctx.font = "50px Oswald";
+  ctx.fillStyle = "red";
+  ctx.textAlign = "center";
+  ctx.fillText("SPACE SHOOTER", canvas.width / 2, canvas.height / 3);
+}
 function displayMessage(message, color = "red") {
-  ctx.font = "30px Arial";
+  ctx.font = "30px Oswald";
   ctx.fillStyle = color;
   ctx.textAlign = "center";
   ctx.fillText(message, canvas.width / 2, canvas.height / 2);
@@ -436,6 +442,7 @@ window.onload = async ()=>{
   game.ready = true;
 	game.end = true;
 
-  displayMessage("Press enter to start the game","green");
-
+  displaytitle();
+  displayMessage("Press [Enter] to start the game","green");
+  
 }
