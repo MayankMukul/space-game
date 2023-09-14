@@ -157,10 +157,6 @@ class Game{
   constructor(){
     this.ready=false;
     this.end=false;
-  
-  // gameObjects = [];
-  // createEnemies();
-  // createHero();
 
   eventEmitter.on(Messages.KEY_EVENT_UP, () => {
     hero.y -= 20;
@@ -189,18 +185,10 @@ class Game{
     second.dead = true;
     
     hero.incrementPoints();
-
     gameObjects.push(new Enemyblast(second.x,second.y,lsaerShotImg));
-    
-    
-    
-      
       if (isEnemiesDead()) {
-        
         eventEmitter.emit(Messages.GAME_END_WIN);
       }
-    
-
   });
 
   eventEmitter.on(Messages.COLLISION_ENEMY_HERO, (_, { enemy }) => {
@@ -258,38 +246,6 @@ let heroImg,
   game = new Game;
 
 
-// async function display (){
-//   const hero = await loadasset("player.png");
-//   const enemyShip = await loadasset("enemyShip.png");
-
-//   let canvas = document.querySelector("#canvas");
-//   var ctx = canvas.getContext("2d");
-
-//   ctx.drawImage(hero, canvas.width / 2 - 45, canvas.height - canvas.height / 4);
-
-//   const monster_number = 5;
-//   const monster_width = monster_number * 98;
-//   const start_x = (canvas.width - monster_width) / 2;
-//   const stop_x = start_x + monster_width;
-
-//   for (let x = start_x; x < stop_x; x += 98) {
-//     for (let y = 0; y < 50 * 5; y += 50) ctx.drawImage(enemyShip, x, y);
-//   }
-// }
-
-
-// class Movable extends GameObject{
-//   constructor(x,y, type){
-//     super(x,y, type);
-//   }
-
-//   moveto(x,y){
-//     this.x = x;
-//     this.y = y;
-//   }
-// }
-
-
 function createHero() {
   hero = new Hero(
     canvas.width / 2 - 45,
@@ -319,7 +275,6 @@ function drawGameObjects(ctx) {
 }
 
 function drawLife() {
-  // TODO, 35, 27
   const START_POS = canvas.width - 180;
   for(let i=0; i < hero.life; i++ ) {
     ctx.drawImage(
@@ -355,10 +310,10 @@ function intersectRect(r1, r2) {
 }
 
 function updateGameObjects() {
-  // console.log("UPDATE GAME");
+
   const enemies = gameObjects.filter(go => go.type === 'Enemy');
   const lasers = gameObjects.filter((go) => go.type === "Laser");
-// laser hit something
+
   lasers.forEach((l) => {
     enemies.forEach((m) => {
       if (intersectRect(l.rectFromGameObject(), m.rectFromGameObject())) {
@@ -366,7 +321,6 @@ function updateGameObjects() {
           first: l,
           second: m,
         });
-        // Enemyblast (m.x,m.y);
       }
     });
   });
@@ -381,9 +335,6 @@ function updateGameObjects() {
   gameObjects = gameObjects.filter(go => !go.dead);
 }  
 
-// function Enemyblast(x,y){
-//     ctx.drawImage(lsaerShotImg,x+20,y);
-// }
 
 function drawText(message, x, y) {
   ctx.fillText(message, x, y);
@@ -398,8 +349,6 @@ function displayMessage(message, color = "red") {
 
 function endGame(win) {
   clearInterval(gameLoopId);
-
-  // set a delay so we are sure any paints have finished
   setTimeout(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "black";
@@ -417,23 +366,23 @@ function endGame(win) {
   }, 200)  
 }
 
-// function resetGame() {
-//   if (gameLoopId) {
-//     clearInterval(gameLoopId);
-//     eventEmitter.clear();
-//     initGame();
-//     gameLoopId = setInterval(() => {
-//       ctx.clearRect(0, 0, canvas.width, canvas.height);
-//       ctx.fillStyle = "black";
-//       ctx.fillRect(0, 0, canvas.width, canvas.height);
-//       drawPoints();
-//       drawLife();
-//       updateGameObjects();
-//       drawGameObjects(ctx);
-//     }, 100);
-//   }
-// }
+function startgame(){
+  gameObjects = [];
+  createEnemies();
+  createHero();
 
+  game.end = false;
+
+  gameLoopId = setInterval(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    updateGameObjects();
+    drawPoints();
+    drawLife();
+    drawGameObjects(ctx);
+  }, 100)
+}
 
 let onekeydown = (e)=>{
   switch (e.keyCode) {
@@ -469,9 +418,6 @@ window.addEventListener("keyup", (evt) => {
 });
 
 
-
-
-
 window.onload = async ()=>{
   canvas=document.getElementById("canvas");
   ctx=canvas.getContext('2d');
@@ -482,39 +428,9 @@ window.onload = async ()=>{
   lsaerShotImg = await loadasset('laserRedShot.png');
   lifeImg = await loadasset("life.png");
 
-  // initGame();
   game.ready = true;
 	game.end = true;
 
   displayMessage("Press enter to start the game","green");
 
-
-       
-    
-    
-   
-  
-
-    
-  
-
-}
-
-
-function startgame(){
-  gameObjects = [];
-  createEnemies();
-  createHero();
-
-  game.end = false;
-
-  gameLoopId = setInterval(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    updateGameObjects();
-    drawPoints();
-    drawLife();
-    drawGameObjects(ctx);
-  }, 100)
 }
