@@ -117,6 +117,19 @@ class Laser extends GameObject {
   }
 }
 
+class Enemyblast extends GameObject {
+  constructor(x,y,img){
+    super(x,y);
+    this.width=56*2;
+    this.height=44*2;
+    this.type = 'blast'
+    this.img = img;
+    setTimeout(()=>{
+      this.dead = true;
+    },200);
+  }
+}
+
 class EventEmitter {
   constructor() {
     this.listeners = {};
@@ -140,6 +153,88 @@ class EventEmitter {
   }
 }
 
+class Game{
+  constructor(){
+    this.ready=false;
+    this.end=false;
+  
+  // gameObjects = [];
+  // createEnemies();
+  // createHero();
+
+  eventEmitter.on(Messages.KEY_EVENT_UP, () => {
+    hero.y -= 20;
+  });
+
+  eventEmitter.on(Messages.KEY_EVENT_DOWN, () => {
+    hero.y += 20;
+  });
+
+  eventEmitter.on(Messages.KEY_EVENT_LEFT, () => {
+    hero.x -= 20;
+  });
+
+  eventEmitter.on(Messages.KEY_EVENT_RIGHT, () => {
+    hero.x += 20;
+  });
+
+  eventEmitter.on(Messages.KEY_EVENT_SPACE, () => {
+    if (hero.canFire()) {
+      hero.fire();
+    }
+  });
+
+  eventEmitter.on(Messages.COLLISION_ENEMY_LASER, (_, { first, second }) => {
+    first.dead = true;
+    second.dead = true;
+    
+    hero.incrementPoints();
+
+    gameObjects.push(new Enemyblast(second.x,second.y,lsaerShotImg));
+    
+    
+    
+      
+      if (isEnemiesDead()) {
+        
+        eventEmitter.emit(Messages.GAME_END_WIN);
+      }
+    
+
+  });
+
+  eventEmitter.on(Messages.COLLISION_ENEMY_HERO, (_, { enemy }) => {
+    enemy.dead = true;
+    hero.decrementLife();
+
+    if (isHeroDead())  {
+      eventEmitter.emit(Messages.GAME_END_LOSS);
+      return; // loss before victory
+    }
+    if (isEnemiesDead()) {
+      eventEmitter.emit(Messages.GAME_END_WIN);
+    }
+ });
+
+ eventEmitter.on(Messages.GAME_END_WIN, () => {
+  endGame(true);
+  game.end = true;
+});
+
+eventEmitter.on(Messages.GAME_END_LOSS, () => {
+endGame(false);
+game.end = true;
+});
+
+eventEmitter.on(Messages.KEY_EVENT_ENTER, () => {
+  // resetGame();
+  if (game.ready && game.end) {
+  startgame();
+  }
+});
+  }
+}
+
 function loadasset(path) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -159,7 +254,8 @@ let heroImg,
   gameObjects = [],
   hero,
   lifeImg,
-  eventEmitter = new EventEmitter();
+  eventEmitter = new EventEmitter(),
+  game = new Game;
 
 
 // async function display (){
@@ -270,7 +366,7 @@ function updateGameObjects() {
           first: l,
           second: m,
         });
-        enemyblst (m.x,m.y);
+        // Enemyblast (m.x,m.y);
       }
     });
   });
@@ -285,9 +381,9 @@ function updateGameObjects() {
   gameObjects = gameObjects.filter(go => !go.dead);
 }  
 
-function enemyblst(x,y){
-    ctx.drawImage(lsaerShotImg,x+20,y);
-}
+// function Enemyblast(x,y){
+//     ctx.drawImage(lsaerShotImg,x+20,y);
+// }
 
 function drawText(message, x, y) {
   ctx.fillText(message, x, y);
@@ -321,22 +417,22 @@ function endGame(win) {
   }, 200)  
 }
 
-function resetGame() {
-  if (gameLoopId) {
-    clearInterval(gameLoopId);
-    eventEmitter.clear();
-    initGame();
-    gameLoopId = setInterval(() => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "black";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      drawPoints();
-      drawLife();
-      updateGameObjects();
-      drawGameObjects(ctx);
-    }, 100);
-  }
-}
+// function resetGame() {
+//   if (gameLoopId) {
+//     clearInterval(gameLoopId);
+//     eventEmitter.clear();
+//     initGame();
+//     gameLoopId = setInterval(() => {
+//       ctx.clearRect(0, 0, canvas.width, canvas.height);
+//       ctx.fillStyle = "black";
+//       ctx.fillRect(0, 0, canvas.width, canvas.height);
+//       drawPoints();
+//       drawLife();
+//       updateGameObjects();
+//       drawGameObjects(ctx);
+//     }, 100);
+//   }
+// }
 
 
 let onekeydown = (e)=>{
@@ -373,75 +469,7 @@ window.addEventListener("keyup", (evt) => {
 });
 
 
-function initGame() {
-  gameObjects = [];
-  createEnemies();
-  createHero();
 
-  eventEmitter.on(Messages.KEY_EVENT_UP, () => {
-    hero.y -= 20;
-  });
-
-  eventEmitter.on(Messages.KEY_EVENT_DOWN, () => {
-    hero.y += 20;
-  });
-
-  eventEmitter.on(Messages.KEY_EVENT_LEFT, () => {
-    hero.x -= 20;
-  });
-
-  eventEmitter.on(Messages.KEY_EVENT_RIGHT, () => {
-    hero.x += 20;
-  });
-
-  eventEmitter.on(Messages.KEY_EVENT_SPACE, () => {
-    if (hero.canFire()) {
-      hero.fire();
-    }
-  });
-
-  eventEmitter.on(Messages.COLLISION_ENEMY_LASER, (_, { first, second }) => {
-    first.dead = true;
-    // second.img = lsaerShotImg;
-    
-    hero.incrementPoints();
-    console.log("before")
-    
-    // setTimeout(() => {
-      second.dead = true;
-      if (isEnemiesDead()) {
-        console.log("after if");
-        eventEmitter.emit(Messages.GAME_END_WIN);
-      }
-    // }, 200);
-
-  });
-
-  eventEmitter.on(Messages.COLLISION_ENEMY_HERO, (_, { enemy }) => {
-    enemy.dead = true;
-    hero.decrementLife();
-
-    if (isHeroDead())  {
-      eventEmitter.emit(Messages.GAME_END_LOSS);
-      return; // loss before victory
-    }
-    if (isEnemiesDead()) {
-      eventEmitter.emit(Messages.GAME_END_WIN);
-    }
- });
-
- eventEmitter.on(Messages.GAME_END_WIN, () => {
-  endGame(true);
-});
-
-eventEmitter.on(Messages.GAME_END_LOSS, () => {
-endGame(false);
-});
-
-eventEmitter.on(Messages.KEY_EVENT_ENTER, () => {
-  resetGame();
-});
-}
 
 
 window.onload = async ()=>{
@@ -454,7 +482,32 @@ window.onload = async ()=>{
   lsaerShotImg = await loadasset('laserRedShot.png');
   lifeImg = await loadasset("life.png");
 
-  initGame();
+  // initGame();
+  game.ready = true;
+	game.end = true;
+
+  displayMessage("Press enter to start the game","green");
+
+
+       
+    
+    
+   
+  
+
+    
+  
+
+}
+
+
+function startgame(){
+  gameObjects = [];
+  createEnemies();
+  createHero();
+
+  game.end = false;
+
   gameLoopId = setInterval(() => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "black";
@@ -464,5 +517,4 @@ window.onload = async ()=>{
     drawLife();
     drawGameObjects(ctx);
   }, 100)
-
 }
