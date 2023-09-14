@@ -159,19 +159,19 @@ class Game{
     this.end=false;
 
   eventEmitter.on(Messages.KEY_EVENT_UP, () => {
-    hero.y -= 20;
+    hero.y -= 10;
   });
 
   eventEmitter.on(Messages.KEY_EVENT_DOWN, () => {
-    hero.y += 20;
+    hero.y += 10;
   });
 
   eventEmitter.on(Messages.KEY_EVENT_LEFT, () => {
-    hero.x -= 20;
+    hero.x -= 10;
   });
 
   eventEmitter.on(Messages.KEY_EVENT_RIGHT, () => {
-    hero.x += 20;
+    hero.x += 10;
   });
 
   eventEmitter.on(Messages.KEY_EVENT_SPACE, () => {
@@ -194,7 +194,7 @@ class Game{
   eventEmitter.on(Messages.COLLISION_ENEMY_HERO, (_, { enemy }) => {
     enemy.dead = true;
     hero.decrementLife();
-
+    gameObjects.push(new Enemyblast(hero.x,hero.y,herohit));
     if (isHeroDead())  {
       eventEmitter.emit(Messages.GAME_END_LOSS);
       return; // loss before victory
@@ -215,7 +215,6 @@ game.end = true;
 });
 
 eventEmitter.on(Messages.KEY_EVENT_ENTER, () => {
-  // resetGame();
   if (game.ready && game.end) {
   startgame();
   }
@@ -256,7 +255,7 @@ function createHero() {
 }
 
 function createEnemies() {
-  const MONSTER_TOTAL = 2;
+  const MONSTER_TOTAL = 5;
   const MONSTER_WIDTH = MONSTER_TOTAL * 98;
   const START_X = (canvas.width - MONSTER_WIDTH) / 2;
   const STOP_X = START_X + MONSTER_WIDTH;
@@ -387,9 +386,14 @@ function startgame(){
 let onekeydown = (e)=>{
   switch (e.keyCode) {
     case 37:
+            eventEmitter.emit(Messages.KEY_EVENT_LEFT);
+            break;  
     case 39:
+            eventEmitter.emit(Messages.KEY_EVENT_RIGHT);
+            break; 
     case 38:
-    case 40:console.log("arrow keys") // Arrow keys
+    case 40: // Arrow keys
+    // case :
     case 32:
       e.preventDefault();
       break; // Space
@@ -427,6 +431,7 @@ window.onload = async ()=>{
   laserImg = await loadasset('laserRed.png');
   lsaerShotImg = await loadasset('laserRedShot.png');
   lifeImg = await loadasset("life.png");
+  herohit = await loadasset("laserGreenShot.png");
 
   game.ready = true;
 	game.end = true;
